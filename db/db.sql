@@ -1,3 +1,3 @@
 \c nc_news
 
-select * from articles;
+select * from comments;
