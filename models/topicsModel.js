@@ -1,7 +1,7 @@
 const knex = require("../connection");
 
 exports.selectTopics = () => {
-  console.log("inside topics model");
+  //console.log("inside topics model");
   return knex("topics")
     .select("*")
     .then(topics => {

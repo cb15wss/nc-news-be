@@ -5,17 +5,17 @@ exports.selectAllUsers = () => {
     .select("*")
     .returning("*")
     .then(users => {
-      console.log("model users", users);
+      // console.log("model users", users);
       return users;
     });
 };
 
 exports.selectUserByUsername = username => {
-  console.log("model username", username);
+  //console.log("model username", username);
   return knex("users")
     .where("username", username)
     .then(result => {
-      console.log("model results", result.length);
+      // console.log("model results", result.length);
       if (result.length === 0) {
         return Promise.reject({
           status: 404,

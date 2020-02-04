@@ -77,7 +77,7 @@ describe("/api", () => {
         .get("/api/users")
         .expect(200)
         .then(response => {
-          console.log("spec users", response.body);
+          //console.log("spec users", response.body);
           expect(response.body).to.be.an("object");
           expect(response.body.users).to.be.an("array");
         });
@@ -132,7 +132,7 @@ describe("/api", () => {
     });
   });
 
-  describe.only("/api/articles", () => {
+  /*describe.only("/api/articles", () => {
     it("GET: 200 - will respond with articles array", () => {
       return request(api)
         .get("/api/articles")
@@ -149,8 +149,68 @@ describe("/api", () => {
             "votes",
             "comment_count"
           ]);
-          */
+          
         });
     });
+  });*/
+  describe("/api/articles/:article_id", () => {
+    it("GET: 200 - Responds with status 200 and an article object", () => {
+      return request(api)
+        .get("/api/articles/1")
+        .expect(200)
+        .then(article => {
+          //console.log("spec article response", article.body);
+          expect(article.body.article).to.be.an("array");
+          expect(article.body.article[0]).to.be.an("object");
+          expect(article.body.article[0]).to.have.keys([
+            "author",
+            "title",
+            "article_id",
+            "body",
+            "topic",
+            "created_at",
+            "votes",
+            "comment_count"
+          ]);
+        });
+    });
+    it("GET: 404 - Article does not exist", () => {
+      return request(api)
+        .get("/api/articles/9178")
+        .expect(404)
+        .then(response => {
+          //  console.log("not article model response", response.body);
+          expect(response.body.msg).to.equal("Article does not exist");
+        });
+    });
+    it("GET: 400 - Invalid Article Id", () => {
+      return request(api)
+        .get("/api/articles/notAnId")
+        .expect(400)
+        .then(response => {
+          //console.log("not article id model response", response.body);
+          expect(response.body.msg).to.equal("Invalid Article Id");
+        });
+    });
+    it("PATCH: 200 return an updated article", () => {
+      return request(api)
+        .patch("/api/articles/1")
+        .send({ inc_votes: 1 })
+        .expect(200)
+        .then(article => {
+          //console.log(article.body.article.votes);
+          expect(article.body.article.votes).to.equal(101);
+        });
+    });
+    /* it.only("POST: 201 responds with posted comment object", () => {});
+    return request(api)
+    .post("/api/articles/1/comments")
+    .send({ inc_votes: 1 })
+    .expect(200)
+    .then(article => {
+      console.log(article.body.article.votes);
+      expect(article.body.article.votes).to.equal(101);
+    });
+    */
   });
 });
