@@ -7,7 +7,7 @@ exports.psqlErrors = (err, req, res, next) => {
   //console.log("psql error handler errors status", err.msg);
 
   if (err.code === "22P02") {
-    res.status(400).send({ msg: "Invalid Article Id" });
+    res.status(400).send({ msg: "Invalid Id" });
   } else if (err.code === "23503") {
     res.status(404).send({ msg: "Does not exist" });
   } else if (err.code === "23502") {

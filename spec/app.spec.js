@@ -64,19 +64,6 @@ describe("API", () => {
         return Promise.all(methodPromises);
       });
     });
-    /*describe.only("/users", () => {
-    describe("/:username", () => {
-      it("GET: 200 responds with user object", () => {
-        return request(api)
-          .get("/api/users/tickle122")
-          .expect(200)
-          .then(user => {
-            console.log("user is ", user);
-          });
-      });
-    });
-  });
-  */
     describe("/api/users", () => {
       describe("GET: 200 -", () => {
         it("200: responds with users object", () => {
@@ -185,7 +172,7 @@ describe("API", () => {
         .expect(400)
         .then(response => {
           //console.log("not article id model response", response.body);
-          expect(response.body.msg).to.equal("Invalid Article Id");
+          expect(response.body.msg).to.equal("Invalid Id");
         });
     });
     it("PATCH: 200 return an updated article", () => {
@@ -214,7 +201,7 @@ describe("API", () => {
         .send({ inc_votes: 6 })
         .expect(400)
         .then(err => {
-          expect(err.body.msg).to.equal("Invalid Article Id");
+          expect(err.body.msg).to.equal("Invalid Id");
         });
     });
     it("400 -no inc_votes on request body", () => {
@@ -226,16 +213,6 @@ describe("API", () => {
           expect(err.body.msg).to.equal("Patch request invalid");
         });
     });
-    /* it.only("POST: 201 responds with posted comment object", () => {});
-    return request(api)
-    .post("/api/articles/1/comments")
-    .send({ inc_votes: 1 })
-    .expect(200)
-    .then(article => {
-      console.log(article.body.article.votes);
-      expect(article.body.article.votes).to.equal(101);
-    });
-    */
   });
 
   describe("PATCH 404 -article id does not exist", () => {
@@ -496,6 +473,70 @@ describe("API", () => {
             });
         });
       });
+    });
+    describe("INVALID METHODS", () => {
+      it("status:405", () => {
+        const invalidMethods = ["patch", "put", "delete"];
+        const methodPromises = invalidMethods.map(method => {
+          return request(api)
+            [method]("/api/articles/1/comments")
+            .expect(405)
+            .then(({ body: { msg } }) => {
+              expect(msg).to.equal("method not allowed");
+            });
+        });
+        return Promise.all(methodPromises);
+      });
+    });
+  });
+  describe("PATCH - /api/comments/:comment_id", () => {
+    //describe("", () => {
+    it("PATCH: 200 return an updated Comment", () => {
+      return request(api)
+        .patch("/api/comments/1")
+        .send({ inc_votes: 1 })
+        .expect(200)
+        .then(comment => {
+          console.log(comment.body.comment.votes);
+          expect(comment.body.comment.votes).to.equal(17);
+        });
+    });
+    it("400 - patch request has no body and no votes cast", () => {
+      return request(api)
+        .patch("/api/comments/2")
+        .send()
+        .expect(400)
+        .then(comment => {
+          expect(comment.body.msg).to.equal("Patch request invalid");
+        });
+    });
+    it("400 - wrong comment id type  ", () => {
+      return request(api)
+        .patch("/api/comments/not-commentId")
+        .send({ inc_votes: 56 })
+        .expect(400)
+        .then(result => {
+          expect(result.body.msg).to.equal("Invalid Id");
+        });
+    });
+    it("400 -no inc_votes on request body", () => {
+      return request(api)
+        .patch("/api/comments/1")
+        .send({ increaseVotes: 70 })
+        .expect(400)
+        .then(err => {
+          expect(err.body.msg).to.equal("Patch request invalid");
+        });
+    });
+
+    it("404 - responds comment not found error", () => {
+      return request(api)
+        .patch("/api/comments/987654")
+        .send({ inc_votes: 22 })
+        .expect(404)
+        .then(err => {
+          expect(err.body.msg).to.equal("Comment not found");
+        });
     });
   });
 });
