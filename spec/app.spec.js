@@ -352,6 +352,15 @@ describe("API", () => {
             expect(comments).to.be.descendingBy("created_at");
           });
       });
+      it("200 order=asc)", () => {
+        return request(api)
+          .get("/api/articles/5/comments?order=asc")
+          .expect(200)
+          .then(response => {
+            const { comments } = response.body;
+            expect(comments).to.be.ascendingBy("created_at");
+          });
+      });
       it("200 sort_by=votes ", () => {
         return request(api)
           .get("/api/articles/1/comments?sort_by=votes")
@@ -360,6 +369,15 @@ describe("API", () => {
             const { comments } = response.body;
             //console.log("model comments are ", comments);
             expect(comments).to.be.descendingBy("votes");
+          });
+      });
+      it("400 sort_by=not_a_column", () => {
+        return request(api)
+          .get("/api/articles/2/comments?sort_by=not_a_column")
+          .expect(400)
+          .then(response => {
+            const { msg } = response.body;
+            expect(msg).to.equal("Column does not exist");
           });
       });
     });
@@ -398,80 +416,139 @@ describe("API", () => {
             ]);
           });
       });
-      describe("Queries", () => {
-        it("defaults to ?sort_by:created_at&order=desc", () => {
-          return request(api)
-            .get("/api/articles")
-            .expect(200)
-            .then(response => {
-              const { articles } = response.body;
-              //console.log("spec comments", comments);
-              expect(articles).to.be.descendingBy("created_at");
-            });
-        });
-        it("200 sort_by=author ", () => {
-          return request(api)
-            .get("/api/articles?sort_by=author")
-            .expect(200)
-            .then(response => {
-              const { articles } = response.body;
-              //console.log("spec articles are ", articles);
-              expect(articles).to.be.descendingBy("author");
-            });
-        });
-        it("404: /api/articles?author=not-an-author", () => {
-          return request(api)
-            .get("/api/articles?sort_by=not-an-author")
-            .expect(404)
-            .then(response => {
-              // const { articles } = response.body;
-              //console.log("spec articles are ", articles);
-              //expect(articles).to.be.descendingBy("author");
-              const { msg } = response.body;
-              expect(msg).to.equal("Column does not exist");
-            });
-        });
-        it("200 sort_by=topic", () => {
-          return request(api)
-            .get("/api/articles?sort_by=topic")
-            .expect(200)
-            .then(response => {
-              const { articles } = response.body;
-              //console.log("spec articles are ", articles);
-              expect(articles).to.be.descendingBy("topic");
-            });
-        });
+      //describe("Queries", () => {
+      it("defaults to ?sort_by:created_at&order=desc", () => {
+        return request(api)
+          .get("/api/articles")
+          .expect(200)
+          .then(response => {
+            const { articles } = response.body;
+            //console.log("spec comments", comments);
+            expect(articles).to.be.descendingBy("created_at");
+          });
+      });
+      it("200 - ?order=asc by created_at", () => {
+        return request(api)
+          .get("/api/articles?order=asc")
+          .expect(200)
+          .then(response => {
+            expect(response.body.articles).to.be.ascendingBy("created_at");
+          });
+      });
 
-        it("GET: 200 - Return articles by topic", () => {
-          return request(api)
-            .get("/api/articles?topic=cats")
-            .expect(200)
-            .then(result => {
-              //console.log("spec result", result.body);
-              expect(result.body.articles.length).to.be.equal(1);
-            });
-        });
-        xit('"404: /api/articles?topic=not-a-topic"', () => {
-          return request(api)
-            .get("/api/articles?topic=not-a-topic")
-            .expect(404)
-            .then(response => {
-              const { articles } = response.body;
-              console.log("spec articles are ", articles);
-              //expect(articles).to.be.descendingBy("author");
-              const { msg } = response.body;
-              expect(msg).to.equal("Column does not exist");
-            });
-        });
-        it("GET: 200 - Return articles by author", () => {
-          return request(api)
-            .get("/api/articles?author=butter_bridge")
-            .expect(200)
-            .then(result => {
-              console.log("spec result", result.body.articles.length);
-              expect(result.body.articles.length).to.be.equal(3);
-            });
-        });
+      it("GET: QUERIES - 200 sort_by=author ", () => {
+        return request(api)
+          .get("/api/articles?sort_by=author")
+          .expect(200)
+          .then(response => {
+            const { articles } = response.body;
+            //console.log("spec articles are ", articles);
+            expect(articles).to.be.descendingBy("author");
+          });
+      });
+      it("404: /api/articles?author=not-an-author", () => {
+        return request(api)
+          .get("/api/articles?author=not-an-author")
+          .expect(404)
+          .then(response => {
+            // const { articles } = response.body;
+            //console.log("spec articles are ", articles);
+            //expect(articles).to.be.descendingBy("author");
+            const { msg } = response.body;
+            expect(msg).to.equal('"not-an-author" not found');
+          });
+      });
+      it("200 sort_by=topic", () => {
+        return request(api)
+          .get("/api/articles?sort_by=topic")
+          .expect(200)
+          .then(response => {
+            const { articles } = response.body;
+            //console.log("spec articles are ", articles);
+            expect(articles).to.be.descendingBy("topic");
+          });
+      });
+
+      it("GET: 200 - Return articles by topic", () => {
+        return request(api)
+          .get("/api/articles?topic=cats")
+          .expect(200)
+          .then(result => {
+            //console.log("spec result", result.body);
+            expect(result.body.articles.length).to.be.equal(1);
+          });
+      });
+      it('"404: /api/articles?topic=notTopic"', () => {
+        return request(api)
+          .get("/api/articles?topic=notTopic")
+          .expect(404)
+          .then(response => {
+            const { articles } = response.body;
+            // console.log("spec articles are ", articles);
+            //expect(articles).to.be.descendingBy("author");
+            const { msg } = response.body;
+            expect(msg).to.equal('"notTopic" not found');
+          });
+      });
+      it("200 - ?topic=paper but with no articles)", () => {
+        return request(api)
+          .get("/api/articles?topic=paper")
+          .expect(200)
+          .then(response => {
+            expect(response.body.articles).to.eql([]);
+          });
+      });
+
+      it("200 - ?sort_by=title", () => {
+        return request(api)
+          .get("/api/articles?sort_by=title")
+          .expect(200)
+          .then(response => {
+            expect(response.body.articles).to.be.descendingBy("title");
+          });
+      });
+      it("400 - ?sort_by=column_does-not-exist", () => {
+        return request(api)
+          .get("/api/articles?sort_by=column_does-not-exist")
+          .expect(400)
+          .then(response => {
+            const { msg } = response.body;
+            expect(msg).to.equal("Column does not exist");
+          });
+      });
+      it("200 - ?sort_by=topic&order=desc", () => {
+        return request(api)
+          .get("/api/articles?sort_by=topic&order=asc")
+          .expect(200)
+          .then(response => {
+            expect(response.body.articles).to.be.ascendingBy("topic");
+          });
+      });
+      it("GET: 200 - Return articles by author", () => {
+        return request(api)
+          .get("/api/articles?author=butter_bridge")
+          .expect(200)
+          .then(result => {
+            //console.log("spec result", result.body.articles.length);
+            expect(result.body.articles.length).to.be.equal(3);
+          });
+      });
+
+      it("404 - ?author=doesNotExist)", () => {
+        return request(api)
+          .get("/api/articles?author=doesNotExist ")
+          .expect(404)
+          .then(response => {
+            expect(response.body.msg).to.equal('"doesNotExist" not found');
+          });
+      });
+      it("200 - ?author=lurker available in the database but has no articles", () => {
+        return request(api)
+          .get("/api/articles?author=lurker")
+          .expect(200)
+          .then(response => {
+            expect(response.body.articles).to.eql([]);
+          });
       });
     });
     describe("INVALID METHODS", () => {
@@ -501,6 +578,15 @@ describe("API", () => {
           expect(comment.body.comment.votes).to.equal(17);
         });
     });
+    it("200 - decrements score", () => {
+      return request(api)
+        .patch("/api/comments/1")
+        .send({ inc_votes: -1 })
+        .expect(200)
+        .then(response => {
+          expect(response.body.comment.votes).to.equal(15);
+        });
+    });
     it("400 - patch request has no body and no votes cast", () => {
       return request(api)
         .patch("/api/comments/2")
@@ -513,7 +599,7 @@ describe("API", () => {
     it("400 - wrong comment id type  ", () => {
       return request(api)
         .patch("/api/comments/not-commentId")
-        .send({ inc_votes: 56 })
+        .send({ inc_votes: "notId" })
         .expect(400)
         .then(result => {
           expect(result.body.msg).to.equal("Invalid Id");
@@ -522,20 +608,65 @@ describe("API", () => {
     it("400 -no inc_votes on request body", () => {
       return request(api)
         .patch("/api/comments/1")
-        .send({ increaseVotes: 70 })
+        .send()
         .expect(400)
         .then(err => {
           expect(err.body.msg).to.equal("Patch request invalid");
         });
     });
 
-    it("404 - responds comment not found error", () => {
+    it("404 - responds comment not found in database", () => {
       return request(api)
         .patch("/api/comments/987654")
         .send({ inc_votes: 22 })
         .expect(404)
         .then(err => {
           expect(err.body.msg).to.equal("Comment not found");
+        });
+    });
+    it("400 - wrong article_id data type", () => {
+      return request(api)
+        .patch("/api/comments/not-an-id")
+        .send({ inc_votes: 1 })
+        .expect(400)
+        .then(response => {
+          expect(response.body.msg).to.equal("Invalid Id");
+        });
+    });
+  });
+  describe("DELETE - /api/comments/:comment_id", () => {
+    it("204 - delete the given comment by comment_id", () => {
+      return request(api)
+        .delete("/api/comments/6")
+        .expect(204)
+        .then(() => {
+          return request(api)
+            .get("/api/articles/1/comments")
+            .expect(200);
+        })
+        .then(response => {
+          const { comments } = response.body;
+          expect(comments).to.have.lengthOf(12);
+        });
+    });
+  });
+  describe("DELETE 400", () => {
+    it("400 - comment_id not in the database", () => {
+      return request(api)
+        .delete("/api/comments/789654")
+        .expect(404)
+        .then(response => {
+          const { msg } = response.body;
+          expect(msg).to.equal("Comment not found");
+        });
+    });
+    it("400 - bad type comment_id", () => {
+      return request(api)
+        .delete("/api/comments/nonId")
+        .expect(400)
+        .then(response => {
+          const { msg } = response.body;
+          expect(msg).to.equal("Invalid Id");
         });
     });
   });

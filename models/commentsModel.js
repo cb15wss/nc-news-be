@@ -16,3 +16,14 @@ exports.patchCommentById = (comment_id, inc_votes = 0) => {
     return Promise.reject({ status: 400, msg: "Patch request invalid" });
   }
 };
+
+exports.deleteCommentById = comment_id => {
+  return knex
+    .from("comments")
+    .where("comment_id", comment_id)
+    .del()
+    .then(response => {
+      if (!response)
+        return Promise.reject({ status: 404, msg: "Comment not found" });
+    });
+};

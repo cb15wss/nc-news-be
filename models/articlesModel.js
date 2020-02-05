@@ -1,4 +1,5 @@
 const knex = require("../connection");
+const { checkIfExists } = require("../models/dbUtilModel");
 
 exports.selectArticleById = article_id => {
   return knex
@@ -104,7 +105,7 @@ exports.selectAllArticles = ({
   order = "desc",
   limit = 10
 }) => {
-  console.log("in articles model topic is ", topic);
+  //console.log("in articles model topic is ", topic);
 
   return knex
     .select(
@@ -124,14 +125,36 @@ exports.selectAllArticles = ({
     .modify(query => {
       if (author) {
         query.where("articles.author", author);
-      } else if (topic) {
+      }
+      if (topic) {
         query.where("articles.topic", topic);
       } else {
         return Promise.reject({ status: 404, msg: "Column does not exist" });
       }
     })
-    .then(results => {
+    .then(articles => {
       //console.log("results in article model ", results);
-      return results;
+      if (articles.length) return [articles];
+      else {
+        let table, column, value;
+        if (author) {
+          table = "users";
+          column = "username";
+          value = author;
+        } else if (topic) {
+          table = "topics";
+          column = "slug";
+          value = topic;
+        }
+
+        return Promise.all([articles, checkIfExists(table, column, value)]);
+      }
+
+      // return articles;
+    })
+    .then(([articles, filterExists]) => {
+      if (articles) return articles;
+      if (filterExists) return [];
+      return Promise.reject({ status: 404, msg: "No articles in database" });
     });
 };

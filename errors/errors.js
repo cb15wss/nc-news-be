@@ -13,7 +13,7 @@ exports.psqlErrors = (err, req, res, next) => {
   } else if (err.code === "23502") {
     res.status(400).send({ msg: "Information missing" });
   } else if (err.code === "42703") {
-    res.status(404).send({ msg: "Column does not exist" });
+    res.status(400).send({ msg: "Column does not exist" });
   } else {
     next(err);
   }
@@ -27,7 +27,7 @@ exports.customErrors = (err, req, res, next) => {
 
     res.status(err.status).send({ msg: err.msg });
   } else {
-    next(err);
+    res.status(500).send({ msg: "Unhandled error", err });
   }
 };
 
