@@ -3,7 +3,7 @@ exports.badMethod = (req, res, next) => {
 };
 
 exports.psqlErrors = (err, req, res, next) => {
-  //console.log("psql error handler errors status", err.code);
+  console.log("psql error handler errors status", err);
   //console.log("psql error handler errors status", err.msg);
 
   if (err.code === "22P02") {
@@ -12,6 +12,8 @@ exports.psqlErrors = (err, req, res, next) => {
     res.status(404).send({ msg: "Does not exist" });
   } else if (err.code === "23502") {
     res.status(400).send({ msg: "Information missing" });
+  } else if (err.code === "42703") {
+    res.status(404).send({ msg: "Column does not exist" });
   } else {
     next(err);
   }

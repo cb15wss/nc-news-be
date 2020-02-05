@@ -386,48 +386,116 @@ describe("API", () => {
           });
       });
     });
-  });
-  describe("/api/articles", () => {
-    it("GET: 200 - will respond with articles array", () => {
-      return request(api)
-        .get("/api/articles")
-        .expect(200)
-        .then(articles_response => {
-          expect(articles_response.body.articles).to.be.an("array");
-          expect(articles_response.body.articles[0]).to.have.keys([
-            "author",
-            "title",
-            "article_id",
-            "body",
-            "topic",
-            "created_at",
-            "votes",
-            "comment_count"
-          ]);
-        });
-    });
-    describe("Queries", () => {
-      it("defaults to ?sort_by:created_at&order=desc", () => {
+    //});
+    describe("/api/articles", () => {
+      it("GET: 200 - will respond with articles array", () => {
         return request(api)
           .get("/api/articles")
           .expect(200)
-          .then(response => {
-            const { articles } = response.body;
-            //console.log("spec comments", comments);
-            expect(articles).to.be.descendingBy("created_at");
+          .then(articles_response => {
+            console.log(
+              "spec article 1 is",
+              articles_response.body.articles[0]
+            );
+
+            expect(articles_response.body.articles).to.be.an("array");
+            expect(articles_response.body.articles[0]).to.eql({
+              author: "butter_bridge",
+              title: "Living in the shadow of a great man",
+              article_id: 1,
+              created_at: "2018-11-15T12:21:54.171Z",
+              votes: 100,
+              topic: "mitch",
+              body: "I find this existence challenging",
+              comment_count: "13"
+            });
+            expect(articles_response.body.articles[0]).to.have.keys([
+              "author",
+              "title",
+              "article_id",
+              "body",
+              "topic",
+              "created_at",
+              "votes",
+              "comment_count"
+            ]);
           });
       });
-      /*it("200 sort_by=votes ", () => {
-        return request(api)
-          .get("/api/articles/1/comments?sort_by=votes")
-          .expect(200)
-          .then(response => {
-            const { comments } = response.body;
-            console.log("model comments are ", comments);
-            expect(comments).to.be.descendingBy("votes");
-          });
+      describe("Queries", () => {
+        it("defaults to ?sort_by:created_at&order=desc", () => {
+          return request(api)
+            .get("/api/articles")
+            .expect(200)
+            .then(response => {
+              const { articles } = response.body;
+              //console.log("spec comments", comments);
+              expect(articles).to.be.descendingBy("created_at");
+            });
+        });
+        it("200 sort_by=author ", () => {
+          return request(api)
+            .get("/api/articles?sort_by=author")
+            .expect(200)
+            .then(response => {
+              const { articles } = response.body;
+              //console.log("spec articles are ", articles);
+              expect(articles).to.be.descendingBy("author");
+            });
+        });
+        it("404: /api/articles?author=not-an-author", () => {
+          return request(api)
+            .get("/api/articles?sort_by=not-an-author")
+            .expect(404)
+            .then(response => {
+              // const { articles } = response.body;
+              //console.log("spec articles are ", articles);
+              //expect(articles).to.be.descendingBy("author");
+              const { msg } = response.body;
+              expect(msg).to.equal("Column does not exist");
+            });
+        });
+        it("200 sort_by=topic", () => {
+          return request(api)
+            .get("/api/articles?sort_by=topic")
+            .expect(200)
+            .then(response => {
+              const { articles } = response.body;
+              //console.log("spec articles are ", articles);
+              expect(articles).to.be.descendingBy("topic");
+            });
+        });
+
+        it("GET: 200 - Return articles by topic", () => {
+          return request(api)
+            .get("/api/articles?topic=cats")
+            .expect(200)
+            .then(result => {
+              //console.log("spec result", result.body);
+              expect(result.body.articles.length).to.be.equal(1);
+            });
+        });
+        xit('"404: /api/articles?topic=not-a-topic"', () => {
+          return request(api)
+            .get("/api/articles?topic=not-a-topic")
+            .expect(404)
+            .then(response => {
+              const { articles } = response.body;
+              console.log("spec articles are ", articles);
+              //expect(articles).to.be.descendingBy("author");
+              const { msg } = response.body;
+              expect(msg).to.equal("Column does not exist");
+            });
+        });
+        it("GET: 200 - Return articles by author", () => {
+          return request(api)
+            .get("/api/articles?author=butter_bridge")
+            .expect(200)
+            .then(result => {
+              console.log("spec result", result.body.articles.length);
+              expect(result.body.articles.length).to.be.equal(3);
+            });
+        });
       });
-      */
     });
   });
 });

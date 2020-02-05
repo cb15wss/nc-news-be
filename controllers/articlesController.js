@@ -1,20 +1,10 @@
 const {
-  selectAllArticles,
   selectArticleById,
   patchArticleById,
   insertComment,
-  selectCommentsById
+  selectCommentsById,
+  selectAllArticles
 } = require("../models/articlesModel");
-
-exports.getAllArticles = (req, resp, next) => {
-  console.log("in articles controller");
-  selectAllArticles()
-    .then(articles => {
-      console.log("articles in articles controller", articles);
-      resp.status(200).send({ articles });
-    })
-    .catch(next);
-};
 
 exports.getArticleById = (req, resp, next) => {
   const { article_id } = req.params;
@@ -55,8 +45,8 @@ exports.postComment = (req, res, next) => {
 
 exports.getAllComments = (req, res, next) => {
   const { article_id } = req.params;
-  console.log("controller", article_id);
-  console.log("query", req.query);
+  //console.log("controller", article_id);
+  // console.log("query", req.query);
   const { sort_by, order } = req.query;
 
   selectCommentsById(article_id, sort_by, order)
@@ -66,4 +56,17 @@ exports.getAllComments = (req, res, next) => {
     .catch(err => {
       next(err);
     });
+};
+
+exports.getAllArticles = (req, resp, next) => {
+  console.log("in articles controller");
+  // console.log("query is ", req.query);
+  const query = req.query;
+  //console.log("query is ", query);
+  selectAllArticles(query)
+    .then(articles => {
+      console.log("articles in articles controller", articles);
+      resp.status(200).send({ articles });
+    })
+    .catch(next);
 };

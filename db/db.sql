@@ -1,3 +1,3 @@
 \c nc_news_test
 
-select * from comments WHERE article_id = 5;
+select * from articles WHERE author = 'butter_bridge';

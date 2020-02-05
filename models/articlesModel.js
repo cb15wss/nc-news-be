@@ -1,29 +1,5 @@
 const knex = require("../connection");
 
-exports.selectAllArticles = (sort_by = "created_at", order = "desc") => {
-  console.log("in articles model");
-
-  return knex
-    .select(
-      "articles.author",
-      "articles.title",
-      "articles.article_id",
-      "articles.created_at",
-      "articles.votes",
-      "articles.topic",
-      "articles.body"
-    )
-    .count({ comment_count: "comments.article_id" })
-    .from("articles")
-    .leftJoin("comments", "articles.article_id", "comments.article_id")
-    .groupBy("articles.article_id")
-    .orderBy(sort_by, order)
-    .then(results => {
-      // console.log("results in article model ", results);
-      return results;
-    });
-};
-
 exports.selectArticleById = article_id => {
   return knex
     .select(
@@ -118,5 +94,44 @@ exports.selectCommentsById = (
         // console.log("model article by id is", article);
         return comments;
       }
+    });
+};
+
+exports.selectAllArticles = ({
+  sort_by = "created_at",
+  author,
+  topic,
+  order = "desc",
+  limit = 10
+}) => {
+  console.log("in articles model topic is ", topic);
+
+  return knex
+    .select(
+      "articles.author",
+      "articles.title",
+      "articles.article_id",
+      "articles.created_at",
+      "articles.votes",
+      "articles.topic",
+      "articles.body"
+    )
+    .count({ comment_count: "comments.article_id" })
+    .from("articles")
+    .leftJoin("comments", "articles.article_id", "comments.article_id")
+    .groupBy("articles.article_id")
+    .orderBy(sort_by, order)
+    .modify(query => {
+      if (author) {
+        query.where("articles.author", author);
+      } else if (topic) {
+        query.where("articles.topic", topic);
+      } else {
+        return Promise.reject({ status: 404, msg: "Column does not exist" });
+      }
+    })
+    .then(results => {
+      //console.log("results in article model ", results);
+      return results;
     });
 };
