@@ -1,3 +1,3 @@
-\c nc_news
+\c nc_news_test
 
-select * from users;
+select * from comments WHERE article_id = 5;
