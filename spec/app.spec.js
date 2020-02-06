@@ -4,7 +4,6 @@ const request = require("supertest");
 const api = require("../app");
 const connection = require("../connection");
 const chai = require("chai");
-const chaiSorted = require("chai-sorted");
 
 chai.use(require("sams-chai-sorted"));
 
@@ -83,7 +82,6 @@ describe("API", () => {
             .get("/api/users")
             .expect(200)
             .then(response => {
-              //console.log("spec users", response.body);
               expect(response.body).to.be.an("object");
               expect(response.body.users).to.be.an("array");
             });
@@ -110,9 +108,13 @@ describe("API", () => {
           .get("/api/users/butter_bridge")
           .expect(200)
           .then(response => {
-            //console.log("user is ", response.body.user);
-            expect(response.body.user).to.be.an("array");
-            expect(response.body.user[0].name).to.equal("jonny");
+            expect(response.body.user).to.be.an("object");
+            expect(response.body.user).to.eql({
+              username: "butter_bridge",
+              avatar_url:
+                "https://www.healthytherapies.com/wp-content/uploads/2016/06/Lime3.jpg",
+              name: "jonny"
+            });
           });
       });
     });
@@ -151,11 +153,19 @@ describe("API", () => {
           .get("/api/articles/1")
           .expect(200)
           .then(article => {
-            //console.log("spec article response", article.body);
+            expect(article.body).to.be.an("object");
+            expect(article.body.article).to.eql({
+              author: "butter_bridge",
+              title: "Living in the shadow of a great man",
+              article_id: 1,
+              created_at: "2018-11-15T12:21:54.171Z",
+              votes: 100,
+              topic: "mitch",
+              body: "I find this existence challenging",
+              comment_count: "13"
+            });
 
-            expect(article.body.article).to.be.an("array");
-            expect(article.body.article[0]).to.be.an("object");
-            expect(article.body.article[0]).to.have.keys([
+            expect(article.body.article).to.have.keys([
               "author",
               "title",
               "article_id",
@@ -174,7 +184,6 @@ describe("API", () => {
         .get("/api/articles/9178")
         .expect(404)
         .then(response => {
-          //  console.log("not article model response", response.body);
           expect(response.body.msg).to.equal("Article does not exist");
         });
     });
@@ -183,7 +192,6 @@ describe("API", () => {
         .get("/api/articles/notAnId")
         .expect(400)
         .then(response => {
-          //console.log("not article id model response", response.body);
           expect(response.body.msg).to.equal("Invalid Id");
         });
     });
@@ -193,7 +201,6 @@ describe("API", () => {
         .send({ inc_votes: 1 })
         .expect(200)
         .then(article => {
-          //console.log(article.body.article.votes);
           expect(article.body.article.votes).to.equal(101);
         });
     });
@@ -203,7 +210,6 @@ describe("API", () => {
         .send()
         .expect(400)
         .then(article => {
-          //console.log(article.body);
           expect(article.body.msg).to.equal("Patch request invalid");
         });
     });
@@ -250,7 +256,6 @@ describe("API", () => {
         .expect(201)
         .then(response => {
           const { comment } = response.body;
-          // console.log(comment, "comment");
           expect(comment).to.have.keys(
             "body",
             "article_id",
@@ -330,7 +335,6 @@ describe("API", () => {
           .get("/api/articles/1/comments")
           .expect(200)
           .then(response => {
-            //console.log("comments in spec", response);
             const { comments } = response.body;
             expect(comments).to.have.lengthOf(13);
             expect(comments[0]).to.have.keys(
@@ -341,6 +345,17 @@ describe("API", () => {
               "body",
               "article_id"
             );
+          });
+      });
+      xit("200 - when article exists but has no comments responds with empty array", () => {
+        return request(api)
+          .get("/api/articles/2/comments")
+          .expect(200)
+          .then(response => {
+            console.log("response in spec", response);
+            const { comments } = response.body;
+            // expect(comments).to.have.lengthOf(0);
+            expect(comments).to.eql([]);
           });
       });
       it("404 - when article_id does not exist", () => {
@@ -360,7 +375,6 @@ describe("API", () => {
           .expect(200)
           .then(response => {
             const { comments } = response.body;
-            //console.log("spec comments", comments);
             expect(comments).to.be.descendingBy("created_at");
           });
       });
@@ -379,7 +393,6 @@ describe("API", () => {
           .expect(200)
           .then(response => {
             const { comments } = response.body;
-            //console.log("model comments are ", comments);
             expect(comments).to.be.descendingBy("votes");
           });
       });
@@ -393,7 +406,6 @@ describe("API", () => {
           });
       });
     });
-    //});
     describe("/api/articles", () => {
       it("GET: 200 - will respond with articles array", () => {
         return request(api)
@@ -423,14 +435,12 @@ describe("API", () => {
             ]);
           });
       });
-      //describe("Queries", () => {
       it("defaults to ?sort_by:created_at&order=desc", () => {
         return request(api)
           .get("/api/articles")
           .expect(200)
           .then(response => {
             const { articles } = response.body;
-            //console.log("spec comments", comments);
             expect(articles).to.be.descendingBy("created_at");
           });
       });
@@ -449,7 +459,6 @@ describe("API", () => {
           .expect(200)
           .then(response => {
             const { articles } = response.body;
-            //console.log("spec articles are ", articles);
             expect(articles).to.be.descendingBy("author");
           });
       });
@@ -458,9 +467,6 @@ describe("API", () => {
           .get("/api/articles?author=not-an-author")
           .expect(404)
           .then(response => {
-            // const { articles } = response.body;
-            //console.log("spec articles are ", articles);
-            //expect(articles).to.be.descendingBy("author");
             const { msg } = response.body;
             expect(msg).to.equal('"not-an-author" not found');
           });
@@ -471,7 +477,6 @@ describe("API", () => {
           .expect(200)
           .then(response => {
             const { articles } = response.body;
-            //console.log("spec articles are ", articles);
             expect(articles).to.be.descendingBy("topic");
           });
       });
@@ -481,7 +486,6 @@ describe("API", () => {
           .get("/api/articles?topic=cats")
           .expect(200)
           .then(result => {
-            //console.log("spec result", result.body);
             expect(result.body.articles.length).to.be.equal(1);
           });
       });
@@ -490,9 +494,6 @@ describe("API", () => {
           .get("/api/articles?topic=notTopic")
           .expect(404)
           .then(response => {
-            const { articles } = response.body;
-            // console.log("spec articles are ", articles);
-            //expect(articles).to.be.descendingBy("author");
             const { msg } = response.body;
             expect(msg).to.equal('"notTopic" not found');
           });
@@ -536,7 +537,6 @@ describe("API", () => {
           .get("/api/articles?author=butter_bridge")
           .expect(200)
           .then(result => {
-            //console.log("spec result", result.body.articles.length);
             expect(result.body.articles.length).to.be.equal(3);
           });
       });

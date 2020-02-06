@@ -5,24 +5,21 @@ exports.selectAllUsers = () => {
     .select("*")
     .returning("*")
     .then(users => {
-      // console.log("model users", users);
       return users;
     });
 };
 
 exports.selectUserByUsername = username => {
-  //console.log("model username", username);
   return knex("users")
     .where("username", username)
-    .then(result => {
-      // console.log("model results", result.length);
-      if (result.length === 0) {
+    .then(([user]) => {
+      if (user === undefined) {
         return Promise.reject({
           status: 404,
           msg: "User does not exist"
         });
       } else {
-        return result;
+        return user;
       }
     });
 };

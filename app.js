@@ -4,11 +4,8 @@ const apiRouter = require("./routers/apiRouter");
 const { notRoute, customErrors, psqlErrors } = require("./errors/errors");
 const usersRouter = require("./routers/usersRouter");
 const articlesRouter = require("./routers/topicsRouter");
-//const sendApiJson = require("./controllers/apiController");
 
 api.use(express.json());
-
-//api.use("/", apiRouter);
 
 api.use("/api", apiRouter);
 

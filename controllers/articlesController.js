@@ -11,6 +11,9 @@ exports.getArticleById = (req, resp, next) => {
 
   selectArticleById(article_id)
     .then(article => {
+      console.log("article in controller 1 is ", article);
+      //console.log("article in controller is ", article[0]);
+      //console.log("article in controller is ", { article });
       resp.status(200).send({ article });
     })
     .catch(err => {
@@ -33,7 +36,6 @@ exports.updateArticleById = (req, resp, next) => {
 
 exports.postComment = (req, res, next) => {
   const { body } = req;
-  //console.log(body, "body is");
   const { article_id } = req.params;
   insertComment(article_id, body)
     .then(comment => {

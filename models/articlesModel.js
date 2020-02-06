@@ -17,14 +17,14 @@ exports.selectArticleById = article_id => {
     .leftJoin("comments", "articles.article_id", "comments.article_id")
     .groupBy("articles.article_id")
     .where("articles.article_id", article_id)
-    .then(results => {
-      if (results.length === 0) {
+    .then(([article]) => {
+      if (article === undefined) {
         return Promise.reject({
           status: 404,
           msg: "Article does not exist"
         });
       } else {
-        return results;
+        return article;
       }
     });
 };
@@ -116,7 +116,6 @@ exports.selectAllArticles = ({
       }
     })
     .then(articles => {
-      //console.log("results in article model ", results);
       if (articles.length) return [articles];
       else {
         let table, column, value;
@@ -134,8 +133,8 @@ exports.selectAllArticles = ({
       }
     })
     .then(([articles]) => {
-      //console.log("articles are ", articles);
       if (articles) return articles;
+
       return Promise.reject({ status: 404, msg: "No articles in database" });
     });
 };

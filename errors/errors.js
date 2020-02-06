@@ -3,9 +3,6 @@ exports.badMethod = (req, res, next) => {
 };
 
 exports.psqlErrors = (err, req, res, next) => {
-  // console.log("psql error handler errors status", err);
-  //console.log("psql error handler errors status", err.msg);
-
   if (err.code === "22P02") {
     res.status(400).send({ msg: "Invalid Id" });
   } else if (err.code === "23503") {
@@ -18,13 +15,9 @@ exports.psqlErrors = (err, req, res, next) => {
     next(err);
   }
 };
-//};
 
 exports.customErrors = (err, req, res, next) => {
-  //console.log("custom error handler", err.msg);
   if (err.msg) {
-    // res.status(400).send({ msg: "Invalid Article Id" });
-
     res.status(err.status).send({ msg: err.msg });
   } else {
     res.status(500).send({ msg: "Unhandled error", err });
