@@ -18,15 +18,12 @@ exports.selectArticleById = article_id => {
     .groupBy("articles.article_id")
     .where("articles.article_id", article_id)
     .then(results => {
-      //console.log("results are", results);
-      // console.log("article model length", results.length);
       if (results.length === 0) {
         return Promise.reject({
           status: 404,
           msg: "Article does not exist"
         });
       } else {
-        // console.log("model article by id is", article);
         return results;
       }
     });
@@ -50,8 +47,6 @@ exports.patchArticleById = (article_id, inc_votes = 0) => {
 };
 
 exports.insertComment = (article_id, comment) => {
-  //console.log(comment, "comment is");
-  //console.log(article_id, "article id is");
   if (comment.body === "" || !comment.body) {
     return Promise.reject({ status: 400, msg: "Invalid post request" });
   }
@@ -60,13 +55,11 @@ exports.insertComment = (article_id, comment) => {
     article_id: article_id,
     body: comment.body
   };
-  // console.log("article to insert is ", articleToInsert);
   return knex
     .returning("*")
     .insert(articleToInsert)
     .into("comments")
     .then(([comment]) => {
-      //  console.log(comment);
       return comment;
     });
 };
@@ -76,23 +69,18 @@ exports.selectCommentsById = (
   sort_by = "created_at",
   order = "desc"
 ) => {
-  //console.log("article id is", article_id);
   return knex
     .select("*")
     .from("comments")
     .where("article_id", article_id)
     .orderBy(sort_by, order)
     .then(comments => {
-      //console.log("comments are", comments);
-      //console.log("comments model length", comments.length);
-      // console.log("articles model comments", comments);
       if (comments.length === 0) {
         return Promise.reject({
           status: 404,
           msg: "Comments does not exist"
         });
       } else {
-        // console.log("model article by id is", article);
         return comments;
       }
     });
@@ -102,11 +90,8 @@ exports.selectAllArticles = ({
   sort_by = "created_at",
   author,
   topic,
-  order = "desc",
-  limit = 10
+  order = "desc"
 }) => {
-  //console.log("in articles model topic is ", topic);
-
   return knex
     .select(
       "articles.author",
@@ -149,12 +134,10 @@ exports.selectAllArticles = ({
 
         return Promise.all([articles, checkIfExists(table, column, value)]);
       }
-
-      // return articles;
     })
-    .then(([articles, filterExists]) => {
+    .then(([articles]) => {
+      //console.log("articles are ", articles);
       if (articles) return articles;
-      if (filterExists) return [];
       return Promise.reject({ status: 404, msg: "No articles in database" });
     });
 };

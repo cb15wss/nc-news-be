@@ -1,7 +1,7 @@
 process.env.NODE_ENV = "test";
 const { expect } = require("chai");
 const request = require("supertest");
-const api = require("../api");
+const api = require("../app");
 const connection = require("../connection");
 const chai = require("chai");
 const chaiSorted = require("chai-sorted");
@@ -11,6 +11,26 @@ chai.use(require("sams-chai-sorted"));
 describe("API", () => {
   beforeEach(() => connection.seed.run());
   after(() => connection.destroy());
+  describe("/not-A-Route", () => {
+    it("GET: /not-A-Route responds with status 404, route not found", () => {
+      return request(api)
+        .get("/api/topcs")
+        .expect(404)
+        .then(({ body }) => {
+          expect(body.msg).to.equal("Route not Found");
+        });
+    });
+  });
+  describe("/api", () => {
+    it("Responds with JSON describing all the available endpoints on the API", () => {
+      return request(api)
+        .get("/api")
+        .expect(200)
+        .then(result => {
+          expect(result).to.be.an("object");
+        });
+    });
+  });
 
   describe("/api/topics", () => {
     describe("GET:200", () => {
@@ -19,10 +39,8 @@ describe("API", () => {
           .get("/api/topics")
           .expect(200)
           .then(topics => {
-            // console.log("spec file topics are ", topics.body);
             expect(topics.body).to.be.an("object");
             expect(topics.body).to.have.keys(["topics"]);
-            //expect(topics.body).to.have.keys(["slug", "description"]);
           });
       });
       it("200 return array of topic objects", () => {
@@ -30,22 +48,16 @@ describe("API", () => {
           .get("/api/topics")
           .expect(200)
           .then(topics => {
-            //console.log("spec file topics are ", topics.body);
             expect(topics.body.topics).to.be.an("array");
-            //expect(topics.body.topics[0]).to.have.keys(["slug", "description"]);
-            //expect(topics.body).to.have.keys(["slug", "description"]);
+            expect(topics.body.topics[0]).to.eql({
+              slug: "mitch",
+              description: "The man, the Mitch, the legend"
+            });
+            expect(topics.body.topics[0]).to.have.keys(["slug", "description"]);
+
             topics.body.topics.forEach(topic => {
               expect(topic).to.have.keys(["slug", "description"]);
             });
-          });
-      });
-      it("GET: /notARoute responds with status 404, route not found", () => {
-        return request(api)
-          .get("/api/topcs")
-          .expect(404)
-          .then(({ body }) => {
-            //  console.log(body.msg);
-            expect(body.msg).to.equal("Route not Found");
           });
       });
     });
@@ -318,7 +330,7 @@ describe("API", () => {
           .get("/api/articles/1/comments")
           .expect(200)
           .then(response => {
-            console.log("comments in spec", response);
+            //console.log("comments in spec", response);
             const { comments } = response.body;
             expect(comments).to.have.lengthOf(13);
             expect(comments[0]).to.have.keys(
@@ -388,11 +400,6 @@ describe("API", () => {
           .get("/api/articles")
           .expect(200)
           .then(articles_response => {
-            console.log(
-              "spec article 1 is",
-              articles_response.body.articles[0]
-            );
-
             expect(articles_response.body.articles).to.be.an("array");
             expect(articles_response.body.articles[0]).to.eql({
               author: "butter_bridge",
@@ -567,14 +574,12 @@ describe("API", () => {
     });
   });
   describe("PATCH - /api/comments/:comment_id", () => {
-    //describe("", () => {
     it("PATCH: 200 return an updated Comment", () => {
       return request(api)
         .patch("/api/comments/1")
         .send({ inc_votes: 1 })
         .expect(200)
         .then(comment => {
-          console.log(comment.body.comment.votes);
           expect(comment.body.comment.votes).to.equal(17);
         });
     });

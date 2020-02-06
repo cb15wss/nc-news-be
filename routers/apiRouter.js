@@ -3,6 +3,13 @@ const topicsRouter = require("./topicsRouter");
 const usersRouter = require("./usersRouter");
 const articlesRouter = require("./articlesRouter");
 const commentsRouter = require("./commentsRouter");
+const sendApiJson = require("../controllers/apiController");
+const { badMethod } = require("../errors/errors");
+
+apiRouter
+  .route("/")
+  .get(sendApiJson)
+  .all(badMethod);
 
 apiRouter.use("/topics", topicsRouter);
 apiRouter.use("/users", usersRouter);
