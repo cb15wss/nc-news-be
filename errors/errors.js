@@ -3,7 +3,7 @@ exports.badMethod = (req, res, next) => {
 };
 
 exports.psqlErrors = (err, req, res, next) => {
-  console.log("psql error handler errors status", err);
+  // console.log("psql error handler errors status", err);
   //console.log("psql error handler errors status", err.msg);
 
   if (err.code === "22P02") {
@@ -29,6 +29,7 @@ exports.customErrors = (err, req, res, next) => {
   } else {
     res.status(500).send({ msg: "Unhandled error", err });
   }
+  next(err);
 };
 
 exports.notRoute = (req, res, next) => {

@@ -113,8 +113,6 @@ exports.selectAllArticles = ({
       }
       if (topic) {
         query.where("articles.topic", topic);
-      } else {
-        return Promise.reject({ status: 404, msg: "Column does not exist" });
       }
     })
     .then(articles => {
