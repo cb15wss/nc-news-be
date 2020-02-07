@@ -364,7 +364,7 @@ describe("API", () => {
           .expect(200)
           .then(response => {
             const { comments } = response.body;
-            expect(comments).to.have.lengthOf(13);
+            expect(comments).to.have.lengthOf(10);
             expect(comments[0]).to.have.keys(
               "comment_id",
               "votes",
@@ -375,7 +375,7 @@ describe("API", () => {
             );
           });
       });
-      it.only("GET - Limit default to 10 comments", () => {
+      it("GET - Limit default to 10 comments", () => {
         return request(api)
           .get("/api/articles/1/comments")
           .expect(200)
@@ -694,7 +694,7 @@ describe("API", () => {
         })
         .then(response => {
           const { comments } = response.body;
-          expect(comments).to.have.lengthOf(12);
+          expect(comments).to.have.lengthOf(10);
         });
     });
   });

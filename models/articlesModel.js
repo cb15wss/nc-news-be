@@ -59,14 +59,15 @@ exports.insertComment = (article_id, comment) => {
 exports.selectCommentsById = (
   article_id,
   sort_by = "created_at",
-  order = "desc"
+  order = "desc",
+  limit = 10
 ) => {
   return knex
     .select("*")
     .from("comments")
     .where("article_id", article_id)
     .orderBy(sort_by, order)
-    .limit(10)
+    .limit(limit)
     .then(comments => {
       if (comments.length) return [comments];
       else {
@@ -87,6 +88,7 @@ exports.selectAllArticles = ({
   sort_by = "created_at",
   author,
   topic,
+  limit = 10,
   order = "desc"
 }) => {
   return knex
@@ -112,7 +114,7 @@ exports.selectAllArticles = ({
         query.where("articles.topic", topic);
       }
     })
-    .limit(10)
+    .limit(limit)
     .then(articles => {
       if (articles.length) return [articles];
       else {
