@@ -1,7 +1,14 @@
 const {
   patchCommentById,
-  deleteCommentById
+  deleteCommentById,
+  selectAllComments
 } = require("../models/commentsModel");
+
+exports.getAllComments = (req, res, next) => {
+  selectAllComments().then(comments => {
+    res.status(200).send({ comments });
+  });
+};
 
 exports.updateCommentById = (req, resp, next) => {
   const { comment_id } = req.params;

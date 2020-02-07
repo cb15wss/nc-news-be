@@ -328,7 +328,25 @@ describe("API", () => {
       return Promise.all(methodPromises);
     });
   });
-
+  describe("/api/comments", () => {
+    it("GET: 200 - will respond with comments objects", () => {
+      return request(api)
+        .get("/api/comments")
+        .expect(200)
+        .then(result => {
+          expect(result.body.comments).to.be.an("array");
+          expect(result.body.comments[0]).to.eql({
+            comment_id: 1,
+            author: "butter_bridge",
+            article_id: 9,
+            votes: 16,
+            created_at: "2017-11-22T12:36:03.389Z",
+            body:
+              "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!"
+          });
+        });
+    });
+  });
   describe("/api/articles/:article_id/comments", () => {
     describe("GET", () => {
       it("200 - responds with comment array of corresponding articles", () => {

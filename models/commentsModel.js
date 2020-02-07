@@ -1,5 +1,13 @@
 const knex = require("../connection");
 
+exports.selectAllComments = () => {
+  return knex("comments")
+    .select("*")
+    .then(comments => {
+      return comments;
+    });
+};
+
 exports.patchCommentById = (comment_id, inc_votes = 0) => {
   if (inc_votes) {
     return knex
