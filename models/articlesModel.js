@@ -110,6 +110,7 @@ exports.selectAllArticles = ({
         query.where("articles.topic", topic);
       }
     })
+    .limit(10)
     .then(articles => {
       if (articles.length) return [articles];
       else {

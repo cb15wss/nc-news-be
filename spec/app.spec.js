@@ -346,6 +346,15 @@ describe("API", () => {
           });
         });
     });
+    it("GET - Limit default to 10", () => {
+      return request(api)
+        .get("/api/comments")
+        .expect(200)
+        .then(result => {
+          expect(result.body.comments).to.be.an("array");
+          expect(result.body.comments.length).to.equal(10);
+        });
+    });
   });
   describe("/api/articles/:article_id/comments", () => {
     describe("GET", () => {
@@ -448,6 +457,15 @@ describe("API", () => {
               "votes",
               "comment_count"
             ]);
+          });
+      });
+      it("GET - Articles Limit default to 10", () => {
+        return request(api)
+          .get("/api/articles")
+          .expect(200)
+          .then(result => {
+            expect(result.body.articles).to.be.an("array");
+            expect(result.body.articles.length).to.equal(10);
           });
       });
       it("defaults to ?sort_by:created_at&order=desc", () => {
