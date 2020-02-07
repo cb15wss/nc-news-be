@@ -11,9 +11,6 @@ exports.getArticleById = (req, resp, next) => {
 
   selectArticleById(article_id)
     .then(article => {
-      console.log("article in controller 1 is ", article);
-      //console.log("article in controller is ", article[0]);
-      //console.log("article in controller is ", { article });
       resp.status(200).send({ article });
     })
     .catch(err => {

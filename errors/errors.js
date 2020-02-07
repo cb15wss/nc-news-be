@@ -3,16 +3,17 @@ exports.badMethod = (req, res, next) => {
 };
 
 exports.psqlErrors = (err, req, res, next) => {
-  if (err.code === "22P02") {
-    res.status(400).send({ msg: "Invalid Id" });
-  } else if (err.code === "23503") {
-    res.status(404).send({ msg: "Does not exist" });
-  } else if (err.code === "23502") {
-    res.status(400).send({ msg: "Information missing" });
-  } else if (err.code === "42703") {
-    res.status(400).send({ msg: "Column does not exist" });
-  } else {
+  if (err.status) {
     next(err);
+  } else {
+    const psqlErrors = {
+      "22P02": [400, "Invalid Id"],
+      "23502": [400, "Information missing"],
+      "23503": [404, "Does not exist"],
+      "42703": [400, "Column does not exist"]
+    };
+    const { code } = err;
+    res.status(psqlErrors[code][0]).send({ msg: psqlErrors[code][1] });
   }
 };
 

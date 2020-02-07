@@ -256,6 +256,7 @@ describe("API", () => {
         .expect(201)
         .then(response => {
           const { comment } = response.body;
+
           expect(comment).to.have.keys(
             "body",
             "article_id",
@@ -269,7 +270,7 @@ describe("API", () => {
     it("400 - when post request has no body", () => {
       return request(api)
         .post("/api/articles/1/comments")
-        .send({ username: "butter_bridge", body: "" })
+        .send({})
         .expect(400)
         .then(response => {
           const { msg } = response.body;
@@ -347,15 +348,13 @@ describe("API", () => {
             );
           });
       });
-      xit("200 - when article exists but has no comments responds with empty array", () => {
+      it("200 - when article exists but has no comments responds with empty array", () => {
         return request(api)
           .get("/api/articles/2/comments")
           .expect(200)
           .then(response => {
-            console.log("response in spec", response);
             const { comments } = response.body;
-            // expect(comments).to.have.lengthOf(0);
-            expect(comments).to.eql([]);
+            expect(comments).to.have.lengthOf(0);
           });
       });
       it("404 - when article_id does not exist", () => {
@@ -364,7 +363,7 @@ describe("API", () => {
           .expect(404)
           .then(response => {
             const { msg } = response.body;
-            expect(msg).to.equal("Comments does not exist");
+            expect(msg).to.equal('"999" not found');
           });
       });
     });
@@ -420,14 +419,12 @@ describe("API", () => {
               created_at: "2018-11-15T12:21:54.171Z",
               votes: 100,
               topic: "mitch",
-              body: "I find this existence challenging",
               comment_count: "13"
             });
             expect(articles_response.body.articles[0]).to.have.keys([
               "author",
               "title",
               "article_id",
-              "body",
               "topic",
               "created_at",
               "votes",

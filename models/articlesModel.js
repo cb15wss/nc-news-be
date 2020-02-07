@@ -3,15 +3,7 @@ const { checkIfExists } = require("../models/dbUtilModel");
 
 exports.selectArticleById = article_id => {
   return knex
-    .select(
-      "articles.author",
-      "articles.title",
-      "articles.article_id",
-      "articles.created_at",
-      "articles.votes",
-      "articles.topic",
-      "articles.body"
-    )
+    .select("articles.*")
     .count({ comment_count: "comments.article_id" })
     .from("articles")
     .leftJoin("comments", "articles.article_id", "comments.article_id")
@@ -75,14 +67,17 @@ exports.selectCommentsById = (
     .where("article_id", article_id)
     .orderBy(sort_by, order)
     .then(comments => {
-      if (comments.length === 0) {
-        return Promise.reject({
-          status: 404,
-          msg: "Comments does not exist"
-        });
-      } else {
-        return comments;
+      if (comments.length) return [comments];
+      else {
+        return Promise.all([
+          false,
+          checkIfExists("articles", "article_id", article_id)
+        ]);
       }
+    })
+    .then(([comments, articleExist]) => {
+      if (comments) return comments;
+      if (articleExist) return [];
     });
 };
 
@@ -99,9 +94,9 @@ exports.selectAllArticles = ({
       "articles.article_id",
       "articles.created_at",
       "articles.votes",
-      "articles.topic",
-      "articles.body"
+      "articles.topic"
     )
+
     .count({ comment_count: "comments.article_id" })
     .from("articles")
     .leftJoin("comments", "articles.article_id", "comments.article_id")
