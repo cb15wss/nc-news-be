@@ -3,6 +3,7 @@ const knex = require("../connection");
 exports.selectAllComments = () => {
   return knex("comments")
     .select("*")
+    .limit(10)
     .then(comments => {
       return comments;
     });
