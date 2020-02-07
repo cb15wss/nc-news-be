@@ -375,6 +375,16 @@ describe("API", () => {
             );
           });
       });
+      it.only("GET - Limit default to 10 comments", () => {
+        return request(api)
+          .get("/api/articles/1/comments")
+          .expect(200)
+          .then(result => {
+            expect(result.body.comments).to.be.an("array");
+            expect(result.body.comments.length).to.equal(10);
+          });
+      });
+
       it("200 - when article exists but has no comments responds with empty array", () => {
         return request(api)
           .get("/api/articles/2/comments")

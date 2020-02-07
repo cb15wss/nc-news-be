@@ -66,6 +66,7 @@ exports.selectCommentsById = (
     .from("comments")
     .where("article_id", article_id)
     .orderBy(sort_by, order)
+    .limit(10)
     .then(comments => {
       if (comments.length) return [comments];
       else {
@@ -75,6 +76,7 @@ exports.selectCommentsById = (
         ]);
       }
     })
+
     .then(([comments, articleExist]) => {
       if (comments) return comments;
       if (articleExist) return [];
