@@ -3,13 +3,13 @@ const topicsRouter = require("./topicsRouter");
 const usersRouter = require("./usersRouter");
 const articlesRouter = require("./articlesRouter");
 const commentsRouter = require("./commentsRouter");
-const { jsonObj } = require("../endpoints.json");
+const allEndPoints = require("../endpoints.json");
 const { badMethod } = require("../errors/errors");
 
 apiRouter
   .route("/")
   .get(function(req, resp) {
-    resp.status(200).send({ jsonObj });
+    resp.status(200).send({ allEndPoints });
   })
   .all(badMethod);
 

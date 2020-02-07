@@ -26,7 +26,7 @@ describe("API", () => {
         .get("/api")
         .expect(200)
         .then(result => {
-          expect(result).to.be.an("object");
+          expect(result.body).to.be.an("object");
         });
     });
   });
