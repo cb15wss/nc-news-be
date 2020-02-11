@@ -365,6 +365,15 @@ describe("API", () => {
           .then(response => {
             const { comments } = response.body;
             expect(comments).to.have.lengthOf(10);
+            expect(comments[0]).to.eql({
+              comment_id: 2,
+              author: "butter_bridge",
+              article_id: 1,
+              votes: 14,
+              created_at: "2016-11-22T12:36:03.389Z",
+              body:
+                "The beautiful thing about treasure is that it exists. Got to find out what kind of sheets these are; not cotton, not rayon, silky."
+            });
             expect(comments[0]).to.have.keys(
               "comment_id",
               "votes",
@@ -381,6 +390,7 @@ describe("API", () => {
           .expect(200)
           .then(result => {
             expect(result.body.comments).to.be.an("array");
+            // console.log('first object is ', result.body.comments[0])
             expect(result.body.comments.length).to.equal(10);
           });
       });
