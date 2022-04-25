@@ -7,7 +7,15 @@ const articlesRouter = require("./routers/topicsRouter");
 const commentsRouter = require("./routers/commentsRouter");
 const cors = require("cors");
 
-api.use(cors());
+const corsOptions = {
+    origin: '*',
+    credentials: true,            //access-control-allow-credentials:true
+    optionSuccessStatus: 200,
+}
+
+api.use(cors(corsOptions)) // Use this after the variable declaration
+
+//api.use(cors());
 
 api.use(express.json());
 
