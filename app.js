@@ -7,17 +7,19 @@ const articlesRouter = require("./routers/topicsRouter");
 const commentsRouter = require("./routers/commentsRouter");
 const cors = require("cors");
 
-const corsOptions = {
-    origin: '*',
-    credentials: true,            //access-control-allow-credentials:true
-    optionSuccessStatus: 200,
-}
-
-api.use(cors(corsOptions)) // Use this after the variable declaration
-
-//api.use(cors());
+api.use(cors());
 
 api.use(express.json());
+
+api.use(function (req, res, next) {
+    res.header('Access-Control-Allow-Origin', "*");
+    res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
+    res.header('Access-Control-Allow-Headers', 'Content-Type');
+    next();
+
+})
+
+
 
 api.use("/api", apiRouter);
 
